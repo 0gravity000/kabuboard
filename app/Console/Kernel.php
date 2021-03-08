@@ -7,6 +7,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 use App\Events\MinitlyStocksCheck;
 use App\Events\DailyStocksCheck;
+use App\Events\DailyDBStoreCheck;
 use \App\InvokeUpdateStocksInfo;
 
 class Kernel extends ConsoleKernel
