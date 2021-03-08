@@ -127,6 +127,9 @@
       <h3>
         基準日：{{ $baseday_str }}
       </h3>
+      <h4>
+        判定条件：出来高が1営業日前より10倍以上の銘柄
+      </h4>
       <div class="table-responsive">
         <table class="table table-striped table-sm">
         <thead>
@@ -141,21 +144,14 @@
         </tr>
         </thead>
         <tbody>
-          @foreach($daily_histories_0 as $daily_history_0)
-          @php
-              $daily_history_minus1 = $daily_histories_minus1->where('stock_id', $daily_history_0->stock_id)->first();
-              if($daily_history_minus1->volume == 0) {
-                $daily_history_minus1->volume = 1;
-              }
-              $deltavolume = floatval($daily_history_0->volume) / floatval($daily_history_minus1->volume)
-          @endphp
+          @foreach($view_daily_histories as $view_daily_history)
             <tr>
-            <td>{{ $daily_history_0->stock->code }}</td>
-            <td>{{ $daily_history_0->stock->name }}</td>
-            <td>{{ $daily_history_0->stock->price }}</td>
-            <td>{{ $deltavolume }}</td>
-            <td>{{ $daily_history_0->volume }}</td>
-            <td>{{ $daily_history_minus1->volume }}</td>
+            <td>{{ $view_daily_history->get('code') }}</td>
+            <td>{{ $view_daily_history->get('name') }}</td>
+            <td>{{ $view_daily_history->get('price') }}</td>
+            <td>{{ $view_daily_history->get('deltavolume') }}</td>
+            <td>{{ $view_daily_history->get('volume') }}</td>
+            <td>{{ $view_daily_history->get('minus1volume') }}</td>
             <td>#</td>
             </tr>
           @endforeach
