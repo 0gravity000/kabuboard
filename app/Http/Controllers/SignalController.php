@@ -44,6 +44,7 @@ class SignalController extends Controller
 
     public function index_akasanpei()
     {
+        //当日 15:00-23:59の間にDailyStocksCheckタスクスケジュールする
         //DailyHistoryテーブルの任意の銘柄を更新日の降順で取得
         //DailyHistoryテーブルに存在する日付の直近日で比較する
         $dates = DailyHistory::where('stock_id', "1")
@@ -153,6 +154,7 @@ class SignalController extends Controller
 
     public function index_kurosanpei()
     {
+        //当日 15:00-23:59の間にDailyStocksCheckタスクスケジュールする
         //DailyHistoryテーブルの任意の銘柄を更新日の降順で取得
         //DailyHistoryテーブルに存在する日付の直近日で比較する
         $dates = DailyHistory::where('stock_id', "1")
