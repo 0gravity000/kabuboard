@@ -50,7 +50,7 @@ class StoreDailySignalAkasanpeiToDB
         $array_temp = array();
         foreach ($daily_histories_0_buf as $daily_history_0_buf) {
             $array_temp = array('stock_id' => $daily_history_0_buf->stock_id,
-                                $baseday_str => $daily_history_0_buf->stock->price); //stocsテーブルのpriceを取得 daily_historiesテーブルのpriceではない
+                                $baseday_str => $daily_history_0_buf->stock->price); //当日のみStockのpriceと同じ。stocsテーブルのpriceを取得 daily_historiesテーブルのpriceではない
             array_push($array_0, $array_temp);
             unset($array_temp);
         }
@@ -67,33 +67,35 @@ class StoreDailySignalAkasanpeiToDB
         for ($bizdayidx=0; $bizdayidx < 3; $bizdayidx++) { 
             $n_bizday_ago = $dates[$bizdayidx + 1]->updated_at;
             $n_bizday_ago_str = $n_bizday_ago->toDateString();
-            //var_dump($bizdayidx);
+            //dd($n_bizday_ago_str, $date_str);
             //n営業日前(-1日する)の算出^^^
 
             //全銘柄分ループするvvv
             for ($arrayidx=0; $arrayidx < count($akasan_array); $arrayidx++) { 
                 $stock_id = $akasan_array[$arrayidx]['stock_id'];
-                //var_dump($stock_id);
-                $price = $akasan_array[$arrayidx][$date_str];
                 //dd($stock_id);
+                $price = $akasan_array[$arrayidx][$date_str];
+                //dd($price);
 
                 $daily_history_n_ago_buf = DailyHistory::where('updated_at', 'LIKE', "%$n_bizday_ago_str%")
                                                             ->where('stock_id', $stock_id)
                                                             ->first();
+                //dd($daily_history_n_ago_buf);
                 //stock_idで検索し、対象銘柄がヒットしなかった場合、除外し次のループへ
                 //(銘柄を取り込んだ直後にこのようなケースとなる）
                 if ($daily_history_n_ago_buf == null) {
-                    //var_dump($daily_history_minus1_buf);
+                    //dd($daily_history_n_ago_buf);
                     continue;
                 }
                 //赤三兵かチェックする
-                if ($daily_history_n_ago_buf->stock->price < $price) {  //stocsテーブルのpriceを取得 daily_historiesテーブルのpriceではない
+                //var_dump('*'.$daily_history_n_ago_buf->price, '-'.$price);
+                if ($daily_history_n_ago_buf->price < $price) {  //daily_historiesテーブルのpriceを取得
                     //赤三兵は数が多く、タイムアウトになってしまう場合があるため、絞り込み条件を追加
                     //変化の割合が1.5%以上かチェック
-                    if ((floatval($daily_history_n_ago_buf->stock->price) > 0) && ($daily_history_n_ago_buf->stock->price != null)) {
-                        $result = (floatval($price) / floatval($daily_history_n_ago_buf->stock->price));
+                    if ((floatval($daily_history_n_ago_buf->price) > 0) && ($daily_history_n_ago_buf->price != null)) {
+                        $result = (floatval($price) / floatval($daily_history_n_ago_buf->price));
                         if ($result >= floatval(1.015)) {
-                            $akasan_array[$arrayidx][$n_bizday_ago_str] = $daily_history_n_ago_buf->stock->price;
+                            $akasan_array[$arrayidx][$n_bizday_ago_str] = $daily_history_n_ago_buf->price;
                             array_push($akasan_array_buf, $akasan_array[$arrayidx]);
                             //dd($akasan_array_buf);
                             //var_dump($daily_history_n_ago_buf->stock_id);
@@ -107,7 +109,6 @@ class StoreDailySignalAkasanpeiToDB
             $date_str = $n_bizday_ago_str;
             array_push($date_array, $date_str);
             $carbondate = $n_bizday_ago;
-            //dd($akasan_array_buf);
         }  //n営業日前(-1日する)の算出^^^
         //dd($akasan_array);
 
