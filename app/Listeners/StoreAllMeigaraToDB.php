@@ -245,7 +245,7 @@ class StoreAllMeigaraToDB
         //URL分ループ
         for ($urlindex=0; $urlindex < $urls->count(); $urlindex++) {
             //dd($urls->count());
-            Log::info($urls->get($urlindex));
+            //Log::info($urls->get($urlindex));
             $crawler = $client->request('GET', $urls->get($urlindex));
             //ページ中の銘柄分ループ
             //カウンタのmaxを30に十分大きい場合、エラーとならない
@@ -257,23 +257,23 @@ class StoreAllMeigaraToDB
                     return $node->filter('td.center.yjM > a')->text();
                 });
                 //$code = $crawler->filter("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td.center.yjM > a")->text();
-                Log::info($code[0]);
                 //dd($code);
                 //$els_code = $page->querySelectorAll("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td.center.yjM > a"); 
                 //銘柄が存在する場合は以下の処理をする。銘柄がない場合は以下の処理は飛ばす
                 if ($code != null) {
+                    //Log::info($code[0]);
                     //市場
                     $market = $crawler->filter("#listTable > table.yjS > tr")->eq($meigaraindex)->each(function($node){
                         return $node->filter('td.center.yjSt')->text();
                     });
-                    Log::info($market[0]);
+                    //Log::info($market[0]);
                     //dd($market);
                     //$els_market = $page->querySelectorAll("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td.center.yjSt"); 
                     //名称
                     $name = $crawler->filter("#listTable > table.yjS > tr")->eq($meigaraindex)->each(function($node){
                         return $node->filter('td:nth-child(3) > strong > a')->text();
                     });
-                    Log::info($name[0]);
+                    //Log::info($name[0]);
                     //dd($name);
                     //$els_name = $page->querySelectorAll("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td:nth-child(3) > strong > a");
                     //取引値
@@ -287,7 +287,7 @@ class StoreAllMeigaraToDB
                             return $node->filter('td:nth-child(4) > div.price.yjM')->text();
                         }
                     });
-                    Log::info($price[0]);
+                    //Log::info($price[0]);
                     //dd($price);
                     //$price = $crawler->filter("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td:nth-child(4) > div.price.yjM > font")->text();
                     //$els_price = $page->querySelectorAll("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td:nth-child(4) > div.price.yjM > font"); 
@@ -296,7 +296,7 @@ class StoreAllMeigaraToDB
                         $price = $crawler->filter("#listTable > table.yjS > tr")->eq($meigaraindex)->each(function($node){
                             return $node->filter('td:nth-child(4) > div.price.yjM')->text();
                         });
-                        Log::info($price[0]);
+                        //Log::info($price[0]);
                         //dd($price);
                         //$price = $crawler->filter("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td:nth-child(4) > div.price.yjM")->text();
                     }
@@ -304,7 +304,7 @@ class StoreAllMeigaraToDB
                     //業種コード
                     $tmpstr = strstr($urls->get($urlindex), 'ids=');
                     $industrycode = substr($tmpstr, 4, 4);
-                    Log::info($industrycode[0]);
+                    //Log::info($industrycode[0]);
                     //dd($industrycode);
                     //業種
                     //セレクタ #listTable > h1
@@ -315,7 +315,7 @@ class StoreAllMeigaraToDB
                     //$tmpstr= $jsHandle_industry->jsonValue();
                     $tmpstr = strstr($tmpstr, '：');
                     $industry = mb_substr($tmpstr, 1);
-                    Log::info($industry[0]);
+                    //Log::info($industry);
                     //dd($industry);
                     //市場コード
                     switch ($market[0]) {
@@ -382,17 +382,9 @@ class StoreAllMeigaraToDB
                          'industry_id' => Industry::where('name', $industry)->first()->id]
                     ); 
 
-                    /*
-                    //DBに登録処理 Eloquentモデル
-                    $meigara_buf = Meigara::updateOrCreate(
-                        ['code' => $code[0]],
-                        ['name' => $name[0], 'market' => $market[0], 'marketcode' => $marketcode,
-                         'industry' => $industry, 'industrycode' => $industrycode]
-                    ); 
-                    */
                 } else { //銘柄がある場合は以下の処理をする。銘柄がない場合は以下の処理は飛ばす END
                     //銘柄がない場合
-                    Log::info('銘柄がない');
+                    //Log::info('銘柄がない');
                 } 
             }   //ページ中の銘柄分ループ END
         }   //URL分ループ END
