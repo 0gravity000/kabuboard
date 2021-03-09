@@ -27,7 +27,10 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\DailyCheckAllMeigara' => [
             'App\Listeners\StoreAllMeigaraToDB',
         ],
-            /*
+        'App\Events\DailySignalVolume' => [
+            'App\Listeners\StoreDailySignalVolumeToDB',
+        ],
+                /*
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
