@@ -33,7 +33,10 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\DailySignalAkasanpei' => [
             'App\Listeners\StoreDailySignalAkasanpeiToDB',
         ],
-
+        'App\Events\DailySignalKurosanpei' => [
+            'App\Listeners\StoreDailySignalKurosanpeiToDB',
+        ],
+    
         /*
         Registered::class => [
             SendEmailVerificationNotification::class,

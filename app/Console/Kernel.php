@@ -12,6 +12,7 @@ use \App\InvokeUpdateStocksInfo;
 use App\Events\DailyCheckAllMeigara;
 use App\Events\DailySignalVolume;
 use App\Events\DailySignalAkasanpei;
+use App\Events\DailySignalKurosanpei;
 
 class Kernel extends ConsoleKernel
 {
@@ -48,6 +49,10 @@ class Kernel extends ConsoleKernel
             event(new DailySignalAkasanpei());
         })->weekdays()->at('16:40');
         
+        $schedule->call(function () {
+            event(new DailySignalKurosanpei());
+        })->weekdays()->at('16:50');
+
         $schedule->call(function () {
             event(new DailyDBStoreCheck());
         })->dailyAt('17:00');

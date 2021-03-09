@@ -35,4 +35,8 @@ class Stock extends Model
     {
         return $this->hasMany('App\SignalAkasanpei');
     }    
+    public function signal_kurosanpeis()
+    {
+        return $this->hasMany('App\SignalKurosanpei');
+    }    
 }

@@ -125,16 +125,19 @@
 	  -->
       <h2>黒三兵</h2>
       <h3>
-        基準日：{{ $date_array[0] }}
+        基準日：{{ $baseday_str }}
       </h3>
+      <h4>
+        判定基準：4営業日連続で値下がりしている銘柄
+      </h4>
       <div class="table-responsive">
         <table class="table table-striped table-sm">
         <thead>
         <tr>
             <th>コード</th>
             <th>銘柄名</th>
-            <th>⊿：現在値（円）</th>
             <th>⊿：変化率（%）</th>
+            <th>⊿：現在値（円）</th>
             <th>現在値（円）</th>
             <th>現在値：1営業日前</th>
             <th>現在値：2営業日前</th>
@@ -143,18 +146,16 @@
         </tr>
         </thead>
         <tbody>
-          @foreach($kurosan_disp_array as $kurosan_elm)
-          @php
-          @endphp
+          @foreach($signalkurosanpeis as $signalkurosanpei)
             <tr>
-            <td>{{ $kurosan_elm[1] }}</td>
-            <td>{{ $kurosan_elm[2] }}</td>
-            <td>{{ $kurosan_elm[3] }}</td>
-            <td>{{ $kurosan_elm[4] }}</td>
-            <td>{{ $kurosan_elm[5] }}</td>
-            <td>{{ $kurosan_elm[6] }}</td>
-            <td>{{ $kurosan_elm[7] }}</td>
-            <td>{{ $kurosan_elm[8] }}</td>
+            <td>{{ $signalkurosanpei->stock->code }}</td>
+            <td>{{ $signalkurosanpei->stock->name }}</td>
+            <td>{{ $signalkurosanpei->deltarate }}</td>
+            <td>{{ $signalkurosanpei->deltaprice }}</td>
+            <td>{{ $signalkurosanpei->stock->price }}</td>
+            <td>{{ $signalkurosanpei->minus1price }}</td>
+            <td>{{ $signalkurosanpei->minus2price }}</td>
+            <td>{{ $signalkurosanpei->minus3price }}</td>
             <td>#</td>
             </tr>
           @endforeach
