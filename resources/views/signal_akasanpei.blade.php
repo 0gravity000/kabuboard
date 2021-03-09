@@ -109,10 +109,10 @@
         <div class="btn-toolbar mb-2 mb-md-0">
           <div class="btn-group mr-2">
             <button type="button" class="btn btn-sm btn-outline-secondary">
-              <a href="#">赤三兵</a>
+              <a href="/signal_akasanpei">赤三兵</a>
             </button>
             <button type="button" class="btn btn-sm btn-outline-secondary">
-              <a href="#">黒三兵</a>
+              <a href="/signal_kurosanpei">黒三兵</a>
             </button>
             <button type="button" class="btn btn-sm btn-outline-secondary">
               <a href="/signal_volume">出来高急増</a>
@@ -125,16 +125,19 @@
 	  -->
       <h2>赤三兵</h2>
       <h3>
-        基準日：{{ $date_array[0] }}
+        基準日：{{ $baseday_str }}
       </h3>
+      <h4>
+        判定基準：4営業日連続で値上がりしている銘柄
+      </h4>
       <div class="table-responsive">
         <table class="table table-striped table-sm">
         <thead>
         <tr>
             <th>コード</th>
             <th>銘柄名</th>
-            <th>⊿：現在値（円）</th>
             <th>⊿：変化率（%）</th>
+            <th>⊿：現在値（円）</th>
             <th>現在値（円）</th>
             <th>現在値：1営業日前</th>
             <th>現在値：2営業日前</th>
@@ -143,18 +146,16 @@
         </tr>
         </thead>
         <tbody>
-          @foreach($akasan_disp_array as $akasan_elm)
-          @php
-          @endphp
+          @foreach($signalakasanpeis as $signalakasanpei)
             <tr>
-            <td>{{ $akasan_elm[1] }}</td>
-            <td>{{ $akasan_elm[2] }}</td>
-            <td>{{ $akasan_elm[3] }}</td>
-            <td>{{ $akasan_elm[4] }}</td>
-            <td>{{ $akasan_elm[5] }}</td>
-            <td>{{ $akasan_elm[6] }}</td>
-            <td>{{ $akasan_elm[7] }}</td>
-            <td>{{ $akasan_elm[8] }}</td>
+            <td>{{ $signalakasanpei->stock->code }}</td>
+            <td>{{ $signalakasanpei->stock->name }}</td>
+            <td>{{ $signalakasanpei->deltarate }}</td>
+            <td>{{ $signalakasanpei->deltaprice }}</td>
+            <td>{{ $signalakasanpei->stock->price }}</td>
+            <td>{{ $signalakasanpei->minus1price }}</td>
+            <td>{{ $signalakasanpei->minus2price }}</td>
+            <td>{{ $signalakasanpei->minus3price }}</td>
             <td>#</td>
             </tr>
           @endforeach

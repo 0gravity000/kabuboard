@@ -8,6 +8,7 @@ use App\DailyHistory;
 use Carbon\Carbon;
 use DateTimeZone;
 use App\Holiday;
+use App\SignalAkasanpei;
 use App\SignalVolume;
 use Illuminate\Support\Arr;
 
@@ -54,102 +55,12 @@ class SignalController extends Controller
         $now = $dates[0]->updated_at;
         //最初に全銘柄分のstock_idと日付を格納した配列を作成
         $baseday_str = $now->toDateString();
-        //dd($now, $one_bizday_ago);
-        $daily_histories_0_buf = DailyHistory::where('updated_at', 'LIKE', "%$baseday_str%")->get();
 
-        //基準日の全stock_idを配列に格納する
-        //この配列から条件を満たさない銘柄を削除していく
-        //dd($daily_histories_0_buf);
-        $array_0 = array();
-        $array_temp = array();
-        foreach ($daily_histories_0_buf as $daily_history_0_buf) {
-            $array_temp = array('stock_id' => $daily_history_0_buf->stock_id,
-                                $baseday_str => $daily_history_0_buf->price);
-            array_push($array_0, $array_temp);
-            unset($array_temp);
-        }
-        //dd($array_0);
+        //該当基準日のデータを⊿変化率の降順でソート
+        $signalakasanpeis = SignalAkasanpei::where('baseday', 'LIKE', "%$baseday_str%")
+                    ->orderByDesc('deltarate')->get();
 
-        //赤三兵判定処理
-        $akasan_array = $array_0;   //配列をコピー
-        $date_str = $baseday_str;
-        $akasan_array_buf = array();    //配列を初期化
-        $carbondate = $now;
-        $date_array = array();
-        array_push($date_array, $baseday_str);
-        //３営業日分の現在値をチェックする
-        for ($bizdayidx=0; $bizdayidx < 3; $bizdayidx++) { 
-            $n_bizday_ago = $dates[$bizdayidx + 1]->updated_at;
-            $n_bizday_ago_str = $n_bizday_ago->toDateString();
-            //var_dump($bizdayidx);
-            //n営業日前(-1日する)の算出^^^
-
-            //全銘柄分ループするvvv
-            for ($arrayidx=0; $arrayidx < count($akasan_array); $arrayidx++) { 
-                $stock_id = $akasan_array[$arrayidx]['stock_id'];
-                //var_dump($stock_id);
-                $price = $akasan_array[$arrayidx][$date_str];
-                //dd($stock_id);
-
-                $daily_history_n_ago_buf = DailyHistory::where('updated_at', 'LIKE', "%$n_bizday_ago_str%")
-                                                            ->where('stock_id', $stock_id)
-                                                            ->first();
-                //stock_idで検索し、対象銘柄がヒットしなかった場合、除外し次のループへ
-                //(銘柄を取り込んだ直後にこのようなケースとなる）
-                if ($daily_history_n_ago_buf == null) {
-                    //var_dump($daily_history_minus1_buf);
-                    continue;
-                }
-                //赤三兵かチェックする
-                if ($daily_history_n_ago_buf->price < $price) {
-                    //赤三兵は数が多く、タイムアウトになってしまう場合があるため、絞り込み条件を追加
-                    //変化の割合が1.5%以上かチェック
-                    if ((floatval($daily_history_n_ago_buf->price) > 0) && ($daily_history_n_ago_buf->price != null)) {
-                        $result = (floatval($price) / floatval($daily_history_n_ago_buf->price));
-                        if ($result >= floatval(1.015)) {
-                            $akasan_array[$arrayidx][$n_bizday_ago_str] = $daily_history_n_ago_buf->price;
-                            array_push($akasan_array_buf, $akasan_array[$arrayidx]);
-                            //dd($akasan_array_buf);
-                            //var_dump($daily_history_n_ago_buf->stock_id);
-                        }
-                    }
-                }
-            }   //全銘柄分ループ^^^
-
-            $akasan_array = $akasan_array_buf;
-            $akasan_array_buf = array();    //空にする
-            $date_str = $n_bizday_ago_str;
-            array_push($date_array, $date_str);
-            $carbondate = $n_bizday_ago;
-            //dd($akasan_array_buf);
-        }  //n営業日前(-1日する)の算出^^^
-        //dd($akasan_array);
-
-        //取得した配列を表示用に加工する
-        $akasan_disp_array = array();
-        $array_temp = array();
-        for ($arrayidx=0; $arrayidx < count($akasan_array); $arrayidx++) {
-            $stock_id = $akasan_array[$arrayidx]['stock_id'];
-            $code = DailyHistory::where('stock_id', $stock_id)->first()->stock->code;
-            $name = DailyHistory::where('stock_id', $stock_id)->first()->stock->name;
-            $price_0 = $akasan_array[$arrayidx][$date_array[0]];
-            $price_1 = $akasan_array[$arrayidx][$date_array[1]];
-            $price_2 = $akasan_array[$arrayidx][$date_array[2]];
-            $price_3 = $akasan_array[$arrayidx][$date_array[3]];
-            $price_delta = floatval($price_0) - floatval($price_3);
-            if ((floatval($price_3) > 0) && ($price_3 != null)) {
-                $price_rate = round((floatval($price_0) / floatval($price_3) * 100), 2);
-            } else {
-                $price_rate = "---";
-            }
-            //$akasan_array[$arrayidx]['price_delta'] = $price_delta;
-
-            $array_temp = array($stock_id, $code, $name, $price_delta, $price_rate, $price_0, $price_1, $price_2, $price_3);
-            array_push($akasan_disp_array, $array_temp);
-            unset($array_temp);
-        }
-        //dd($akasan_disp_array);
-        return view('signal_akasanpei', compact('akasan_disp_array', 'date_array'));
+        return view('signal_akasanpei', compact('signalakasanpeis', 'baseday_str'));
     }
 
     public function index_kurosanpei()
