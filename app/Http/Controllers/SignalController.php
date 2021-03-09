@@ -76,9 +76,9 @@ class SignalController extends Controller
         $now = $dates[0]->updated_at;
         $baseday_str = $now->toDateString();
 
-        //該当基準日のデータを⊿変化率の降順でソート
+        //該当基準日のデータを⊿変化率の昇順でソート
         $signalkurosanpeis = SignalKurosanpei::where('baseday', 'LIKE', "%$baseday_str%")
-                    ->orderByDesc('deltarate')->get();
+                    ->orderBy('deltarate')->get();
 
         return view('signal_kurosanpei', compact('signalkurosanpeis', 'baseday_str'));
     }
