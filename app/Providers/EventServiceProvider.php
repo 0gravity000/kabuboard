@@ -24,7 +24,10 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\DailyDBStoreCheck' => [
             'App\Listeners\DeleteExtraRecodes',
         ],
-        /*
+        'App\Events\DailyCheckAllMeigara' => [
+            'App\Listeners\StoreAllMeigaraToDB',
+        ],
+            /*
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],

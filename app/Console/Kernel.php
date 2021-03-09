@@ -9,6 +9,7 @@ use App\Events\MinitlyStocksCheck;
 use App\Events\DailyStocksCheck;
 use App\Events\DailyDBStoreCheck;
 use \App\InvokeUpdateStocksInfo;
+use App\Events\DailyCheckAllMeigara;
 
 class Kernel extends ConsoleKernel
 {
@@ -40,6 +41,10 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             event(new DailyDBStoreCheck());
         })->dailyAt('17:00');
+
+        $schedule->call(function () {
+            event(new DailyCheckAllMeigara());
+        })->dailyAt('17:10');
 
         //$schedule->call(new InvokeUpdateStocksInfo)->everyMinute();
         // $schedule->command('inspire')->hourly();

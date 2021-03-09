@@ -1,41 +1,42 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Listeners;
 
-use App\Stock;
-//use App\Code;
+use App\Events\DailyCheckAllMeigara;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
+use Goutte\Client;
 use App\Market;
 use App\Industry;
-use App\Meigara;
-use Illuminate\Http\Request;
+use App\Stock;
 
-use Goutte\Client;
-use App\Events\DailyCheckAllMeigara;
-
-class MeigaraController extends Controller
+class StoreAllMeigaraToDB
 {
     /**
-     * Display a listing of the resource.
+     * Create the event listener.
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
-    public function index()
+    public function __construct()
     {
-        $stocks = Stock::all();
-        /*
-        foreach ($codes as $code) {
-            dd($code);
-        }
-        */
-        return view('meigara', compact('stocks'));
+        //
     }
 
-    public function import()
+    /**
+     * Handle the event.
+     *
+     * @param  DailyCheckAllMeigara  $event
+     * @return void
+     */
+    public function handle(DailyCheckAllMeigara $event)
     {
+        //
         $client = new Client();   //composer require fabpot/goutte しておくこと
         //要検討
         //245ページを1度にスクレイピングできない。30秒のタイムアウトにひっかかる
-        $ulrs = array(
+        //コレクションにURLを格納 chunkを使いたいため
+        $urls = collect([
             'https://stocks.finance.yahoo.co.jp/stocks/qi/?ids=0050&p=1', //水産・農林業 (11)
             'https://stocks.finance.yahoo.co.jp/stocks/qi/?ids=1050&p=1', //鉱業 (6)
             'https://stocks.finance.yahoo.co.jp/stocks/qi/?ids=2050&p=1', //建設業 (171)
@@ -239,27 +240,24 @@ class MeigaraController extends Controller
             'https://stocks.finance.yahoo.co.jp/stocks/qi/?ids=9050&p=23',
             'https://stocks.finance.yahoo.co.jp/stocks/qi/?ids=9050&p=24',
             'https://stocks.finance.yahoo.co.jp/stocks/qi/?ids=9050&p=25'
-        );
+        ]);
         
         //URL分ループ
-        for ($urlindex=0; $urlindex < count($ulrs); $urlindex++) { 
-            $crawler = $client->request('GET', $ulrs[$urlindex]);
-            //$page->goto($ulrs[$urlindex]);
+        for ($urlindex=0; $urlindex < $urls->count(); $urlindex++) {
+            //dd($urls->count());
+            Log::info($urls->get($urlindex));
+            $crawler = $client->request('GET', $urls->get($urlindex));
             //ページ中の銘柄分ループ
             //カウンタのmaxを30に十分大きい場合、エラーとならない
             //カウンタのmaxが23だと、ページの最後の銘柄を読んだときなぜかエラーになる
             for ($meigaraindex = 1; $meigaraindex < 30; $meigaraindex++) {
-                $els_code = "";
-                $els_market = "";
-                $els_name = "";
-                $els_price = "";
                 //コード
-                //var_dump($crawler);
-                //print_r($code);
+                //dd($crawler);
                 $code = $crawler->filter("#listTable > table.yjS > tr")->eq($meigaraindex)->each(function($node){
                     return $node->filter('td.center.yjM > a')->text();
                 });
                 //$code = $crawler->filter("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td.center.yjM > a")->text();
+                Log::info($code);
                 //dd($code);
                 //$els_code = $page->querySelectorAll("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td.center.yjM > a"); 
                 //銘柄が存在する場合は以下の処理をする。銘柄がない場合は以下の処理は飛ばす
@@ -268,12 +266,14 @@ class MeigaraController extends Controller
                     $market = $crawler->filter("#listTable > table.yjS > tr")->eq($meigaraindex)->each(function($node){
                         return $node->filter('td.center.yjSt')->text();
                     });
+                    Log::info($market);
                     //dd($market);
                     //$els_market = $page->querySelectorAll("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td.center.yjSt"); 
                     //名称
                     $name = $crawler->filter("#listTable > table.yjS > tr")->eq($meigaraindex)->each(function($node){
                         return $node->filter('td:nth-child(3) > strong > a')->text();
                     });
+                    Log::info($name);
                     //dd($name);
                     //$els_name = $page->querySelectorAll("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td:nth-child(3) > strong > a");
                     //取引値
@@ -287,6 +287,7 @@ class MeigaraController extends Controller
                             return $node->filter('td:nth-child(4) > div.price.yjM')->text();
                         }
                     });
+                    Log::info($price);
                     //dd($price);
                     //$price = $crawler->filter("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td:nth-child(4) > div.price.yjM > font")->text();
                     //$els_price = $page->querySelectorAll("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td:nth-child(4) > div.price.yjM > font"); 
@@ -295,13 +296,15 @@ class MeigaraController extends Controller
                         $price = $crawler->filter("#listTable > table.yjS > tr")->eq($meigaraindex)->each(function($node){
                             return $node->filter('td:nth-child(4) > div.price.yjM')->text();
                         });
-                        dd($price);
+                        Log::info($price);
+                        //dd($price);
                         //$price = $crawler->filter("#listTable > table > tbody > tr:nth-child(" . $meigaraindex . ") > td:nth-child(4) > div.price.yjM")->text();
                     }
 
                     //業種コード
-                    $tmpstr = strstr($ulrs[$urlindex], 'ids=');
+                    $tmpstr = strstr($urls->get($urlindex), 'ids=');
                     $industrycode = substr($tmpstr, 4, 4);
+                    Log::info($industrycode);
                     //dd($industrycode);
                     //業種
                     //セレクタ #listTable > h1
@@ -312,6 +315,7 @@ class MeigaraController extends Controller
                     //$tmpstr= $jsHandle_industry->jsonValue();
                     $tmpstr = strstr($tmpstr, '：');
                     $industry = mb_substr($tmpstr, 1);
+                    Log::info($industry);
                     //dd($industry);
                     //市場コード
                     switch ($market[0]) {
@@ -361,9 +365,6 @@ class MeigaraController extends Controller
                             $marketcode = 99;
                     }
 
-                    //デバッグコード
-                    //print_r($code[0] . ":" . $market[0] . ":" . $name[0] . ":" . $price[0] .":" . $marketcode .":" . $industry .":" . (int)$industrycode ."/");
-
                     //DBに登録処理 Eloquentモデル
                     $market_buf = Market::updateOrCreate(
                         ['code' => $marketcode],
@@ -390,76 +391,9 @@ class MeigaraController extends Controller
                     ); 
                     */
 
-                } //銘柄かある場合は以下の処理をする。銘柄がない場合は以下の処理は飛ばす END
+                } //銘柄がある場合は以下の処理をする。銘柄がない場合は以下の処理は飛ばす END
             }   //ページ中の銘柄分ループ END
+            Log::info($urls->get($urlindex));
         }   //URL分ループ END
-
-        return redirect('/meigara');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Meigara  $meigara
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Meigara $meigara)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Meigara  $meigara
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Meigara $meigara)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Meigara  $meigara
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Meigara $meigara)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Meigara  $meigara
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Meigara $meigara)
-    {
-        //
     }
 }
