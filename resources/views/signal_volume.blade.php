@@ -144,14 +144,14 @@
         </tr>
         </thead>
         <tbody>
-          @foreach($view_daily_histories as $view_daily_history)
+          @foreach($signalvolumes as $signalvolume)
             <tr>
-            <td>{{ $view_daily_history->get('code') }}</td>
-            <td>{{ $view_daily_history->get('name') }}</td>
-            <td>{{ $view_daily_history->get('price') }}</td>
-            <td>{{ $view_daily_history->get('deltavolume') }}</td>
-            <td>{{ $view_daily_history->get('volume') }}</td>
-            <td>{{ $view_daily_history->get('minus1volume') }}</td>
+            <td>{{ $signalvolume->stock->code }}</td>
+            <td>{{ $signalvolume->stock->name }}</td>
+            <td>{{ $signalvolume->stock->price }}</td>
+            <td>{{ $signalvolume->deltavolume }}</td>
+            <td>{{ $signalvolume->stock->volume }}</td>
+            <td>{{ $signalvolume->minus1volume }}</td>
             <td>#</td>
             </tr>
           @endforeach

@@ -27,4 +27,8 @@ class Stock extends Model
     {
         return $this->hasMany('App\DailyHistory');
     }    
+    public function signal_volumes()
+    {
+        return $this->hasMany('App\SignalVolume');
+    }    
 }

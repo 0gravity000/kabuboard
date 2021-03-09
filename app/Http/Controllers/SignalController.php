@@ -8,6 +8,7 @@ use App\DailyHistory;
 use Carbon\Carbon;
 use DateTimeZone;
 use App\Holiday;
+use App\SignalVolume;
 use Illuminate\Support\Arr;
 
 class SignalController extends Controller
@@ -25,89 +26,21 @@ class SignalController extends Controller
      */
     public function index_volume()
     {
+        //当日 15:00-23:59の間にDailyStocksCheckタスクスケジュールする
         //DailyHistoryテーブルの任意の銘柄を更新日の降順で取得
         //DailyHistoryテーブルに存在する日付の直近日で比較する
         $dates = DailyHistory::where('stock_id', "1")
                             ->orderBy('updated_at', 'desc')
                             ->get();
         //dd($dates[0]->updated_at);
-
         $now = $dates[0]->updated_at;
-        $one_bizday_ago = $dates[1]->updated_at;
-        
         $baseday_str = $now->toDateString();
-        $one_bizday_ago_str = $one_bizday_ago->toDateString();
-        //dd($now, $one_bizday_ago);
-        //dd($baseday_str, $one_bizday_ago_str);
+        //該当基準日のデータを⊿出来高（倍率）の降順でソート
+        $signalvolumes = SignalVolume::where('baseday', 'LIKE', "%$baseday_str%")
+                    ->orderByDesc('deltavolume')->get();
 
-        //
-        $daily_histories_0_buf = DailyHistory::where('updated_at', 'LIKE', "%$baseday_str%")->get();
-        //dd($daily_histories_0_buf);
-        $array_0 = array();
-        $array_minus1 = array();
-        //出来高急増判定
-        foreach ($daily_histories_0_buf as $daily_history_0_buf) {
-            $daily_history_minus1_buf = DailyHistory::where('updated_at', 'LIKE', "%$one_bizday_ago_str%")
-                                                ->where('stock_id', $daily_history_0_buf->stock_id)
-                                                ->first();
-            //stock_idで検索し、対象銘柄がヒットしなかった場合、除外し次のループへ
-            //(銘柄を取り込んだ直後にこのようなケースとなる）
-            if ($daily_history_minus1_buf == null) {
-                //var_dump($daily_history_minus1_buf);
-                continue;
-            }
-            //dd($daily_history_0_buf, $daily_history_minus1_buf);
-            //基準日と1営業日前の両方の出来高が0のものは除外
-            if (intval($daily_history_0_buf->volume) == 0 && intval($daily_history_minus1_buf->volume) == 0) {
-                continue;
-            }
-            //1営業日前の出来高が1以下のものは除外
-            if (intval($daily_history_minus1_buf->volume) <= 1) {
-                continue;
-            }
-        //出来高が1営業日前より10倍増えているかチェック
-            if (intval($daily_history_0_buf->volume) >= intval($daily_history_minus1_buf->volume)*10) {
-                //dd($daily_history_0_buf, $daily_history_minus1_buf);
-                //dd($daily_history_0_buf->volume, $daily_history_minus1_buf->volume);
-                array_push($array_0, $daily_history_0_buf->id);
-                array_push($array_minus1, $daily_history_minus1_buf->id);
-            }
-        }
-        //
-        //dd($array_0, $array_minus1);
-        $daily_histories_0 = DailyHistory::whereIn('id', $array_0)->get();
-        $daily_histories_minus1 = DailyHistory::whereIn('id', $array_minus1)->get();
-
-        //view表示用のコレクションを作る ソートしたいため
-        $view_daily_histories_buf = collect([]);
-        foreach($daily_histories_0 as $daily_history_0) {
-            $daily_history_minus1 = $daily_histories_minus1->where('stock_id', $daily_history_0->stock_id)->first();
-            $deltavolume = floatval($daily_history_0->volume) / floatval($daily_history_minus1->volume);
-
-            $view_daily_history = collect([]);
-            $view_daily_history->put('code', $daily_history_0->stock->code);
-            $view_daily_history->put('name', $daily_history_0->stock->name);
-            $view_daily_history->put('price', $daily_history_0->stock->price);
-            $view_daily_history->put('deltavolume', $deltavolume);
-            $view_daily_history->put('volume', $daily_history_0->volume);
-            $view_daily_history->put('minus1volume', $daily_history_minus1->volume);
-
-            $view_daily_histories_buf->push($view_daily_history);
-        }
-        //dd($view_daily_histories_buf);
-
-        //⊿出来高（倍率）の降順でソート
-        $view_daily_histories = $view_daily_histories_buf->sortByDesc('deltavolume');
-        $view_daily_histories->values()->all();
-        //dd($view_daily_histories);
-
-        //$daily_histories_0 = DailyHistory::whereIn('id', $array_0)->orderByDesc('price')->get();
-        //$daily_histories_minus1 = DailyHistory::whereIn('id', $array_minus1)->orderByDesc('price')->get();
-        //dd($daily_histories_0, $daily_histories_minus1);
-
-        return view('signal_volume', compact('view_daily_histories','baseday_str'));
+        return view('signal_volume', compact('signalvolumes', 'baseday_str'));
     }
-
 
     public function index_akasanpei()
     {
