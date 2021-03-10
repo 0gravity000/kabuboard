@@ -24,31 +24,31 @@
     {{ csrf_field() }}
     <div class="form-group">
       <label for="code">コード</label>
-      <input class="form-control" name="code" id="disabledInput" type="text" placeholder={{ $realtime_setting->stock->code }} disabled>
+      <input class="form-control" name="code" type="text" placeholder={{ $realtime_setting->stock->code }} disabled>
     </div>
     <div class="form-group">
       <label for="name">銘柄名</label>
-      <input class="form-control" name="name" id="disabledInput" type="text" placeholder={{ $realtime_setting->stock->name }} disabled>
+      <input class="form-control" name="name" type="text" placeholder={{ $realtime_setting->stock->name }} disabled>
     </div>
     <div class="form-group">
       <label for="price">現在値</label>
-      <input class="form-control" name="price" id="disabledInput" type="text" placeholder={{ $realtime_setting->stock->price }} disabled>
+      <input class="form-control" name="price" type="text" placeholder={{ $realtime_setting->stock->price }} disabled>
     </div>
     <div class="form-group">
       <label for="rate">変化率</label>
-      <input class="form-control" name="rate" id="disabledInput" type="text" placeholder={{ $realtime_setting->stock->rate }} disabled>
+      <input class="form-control" name="rate" type="text" placeholder={{ $realtime_setting->stock->rate }} disabled>
     </div>
     <div class="form-group">
       <label for="ismatched_upperlimit">条件成立フラグ 上限値</label>
-      <input class="form-control" name="ismatched_upperlimit" id="disabledInput" type="text" placeholder={{ $realtime_setting->ismatched_upperlimit }} disabled>
+      <input class="form-control" name="ismatched_upperlimit" type="text" placeholder={{ $realtime_setting->ismatched_upperlimit }} disabled>
     </div>
     <div class="form-group">
       <label for="ismatched_lowerlimit">条件成立フラグ 下限値</label>
-      <input class="form-control" name="ismatched_lowerlimit" id="disabledInput" type="text" placeholder={{ $realtime_setting->ismatched_lowerlimit }} disabled>
+      <input class="form-control" name="ismatched_lowerlimit" type="text" placeholder={{ $realtime_setting->ismatched_lowerlimit }} disabled>
     </div>
     <div class="form-group">
       <label for="ismatched_changerate">条件成立フラグ ⊿変化率</label>
-      <input class="form-control" name="ismatched_changerate" id="disabledInput" type="text" placeholder={{ $realtime_setting->ismatched_changerate }} disabled>
+      <input class="form-control" name="ismatched_changerate" type="text" placeholder={{ $realtime_setting->ismatched_changerate }} disabled>
     </div>
     <div class="form-group">
       <label for="upperlimit">上限値</label>
