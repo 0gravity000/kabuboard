@@ -11,14 +11,16 @@ use App\Events\MinitlyStocksCheck;
 use DateTime;
 use App\MatchedHistory;
 use DateTimeZone;
+use Illuminate\Support\Facades\Auth;
 
 class RealtimeController extends Controller
 {
 
     public function index_checking()
     {
-        $realtime_checkings = RealtimeChecking::all();
-        return view('realtime_checking', compact('realtime_checkings'));
+        $realtime_settings = RealtimeSetting::where('user_id', Auth::id())->get();
+        //$realtime_checkings = RealtimeChecking::all();
+        return view('realtime_checking', compact('realtime_settings'));
     }
     /**
      * Display a listing of the resource.
@@ -27,13 +29,19 @@ class RealtimeController extends Controller
      */
     public function index_setting()
     {
-        $realtime_settings = RealtimeSetting::all();
+        $realtime_settings = RealtimeSetting::where('user_id', Auth::id())->get();
+        //$realtime_settings = RealtimeSetting::all();
         return view('realtime_setting', compact('realtime_settings'));
     }
 
     public function index_history()
     {
-        $matched_histories = MatchedHistory::orderBy('matchedat', 'desc')->get();
+        $realtime_settings = RealtimeSetting::where('user_id', Auth::id())->get();
+        $realtime_settings_ids = $realtime_settings->pluck('id');
+        //dd($realtime_settings_ids);
+        $matched_histories = MatchedHistory::where('realtime_setting_id', $realtime_settings_ids)->get();
+        //dd($matched_histories);
+        //$matched_histories = MatchedHistory::orderBy('matchedat', 'desc')->get();
         return view('realtime_history', compact('matched_histories'));
     }
 
@@ -57,27 +65,30 @@ class RealtimeController extends Controller
     public function store(Request $request)
     {
         //dd(request()->code);
-        $stocks = Stock::where('code', request()->code);
-        //dd($codes->first());
-        //codesテーブルにないコードの場合
-        if($stocks->first() == null) {
-            return redirect('/realtime/create');
-            //dd('$codes->first() == null');
-        } 
 
-        $realtime_settings = RealtimeSetting::where('stock_id', $stocks->first()->id);
+        //stocksテーブルのcodesカラムの存在チェック
+        $validatedData = $request->validate([
+            'code' => 'required|exists:stocks,code',
+        ]);        
+        $stocks = Stock::where('code', request()->code)->first();
+
+        //ログイン済みのユーザーで指定銘柄の存在チェック
+        //バリデートの実装 要検討
+        $realtime_setting = RealtimeSetting::where('stock_id', $stocks->id)
+                                ->where('user_id', Auth::id())->first();
         //dd($realtimeSettings);
-        //realtime_ettingsテーブルにすでに登録がある場合
-        if($realtime_settings->first() != null) {
+        //realtime_settingsテーブルにすでに登録がある場合
+        if($realtime_setting != null) {
             //dd('$realtimeSettings->first() != null');
+            $request->session()->flash('status', '銘柄は既に登録されています');
             return redirect('/realtime/create');
         } 
 
         $realtime_setting = new RealtimeSetting;
         //$code = new Code;
         //dd($code);
-        $realtime_setting->user_id = 1;
-        $realtime_setting->stock_id = $stocks->first()->id;
+        $realtime_setting->user_id = Auth::id();
+        $realtime_setting->stock_id = $stocks->id;
         $realtime_setting->ismatched_upperlimit = false;
         $realtime_setting->ismatched_lowerlimit = false;
         $realtime_setting->ismatched_changerate = false;
@@ -180,15 +191,20 @@ class RealtimeController extends Controller
 
     public function destroy_history($id)
     {
-        if ($id == 0) { //全銘柄削除
-            MatchedHistory::query()->delete();
-            return redirect('/realtime_history');
-        } else {
-            $matched_history = MatchedHistory::where('id', $id)->first();
-        }
+        $matched_history = MatchedHistory::where('id', $id)->first();
         //dd($realtime_setting);
         $matched_history->delete();
         return redirect('/realtime_history');
+    }
+
+    public function destroy_allhistory()
+    {
+        $realtime_settings = RealtimeSetting::where('user_id', Auth::id())->get();
+        foreach ($realtime_settings as $realtime_setting) {
+            $matched_history = MatchedHistory::where('id', $realtime_setting->matched_history->id)->first();
+            $matched_history->delete();
+        }
+       return redirect('/realtime_history');
     }
 
 }
