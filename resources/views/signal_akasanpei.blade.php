@@ -27,7 +27,7 @@
         基準日：{{ $baseday_str }}
       </h3>
       <h4>
-        判定基準：4営業日連続で値上がりしている銘柄
+        判定基準：3営業日連続で値上がりしている銘柄
       </h4>
       <div class="table-responsive">
         <table class="table table-striped table-sm">

@@ -91,10 +91,10 @@ class StoreDailySignalKurosanpeiToDB
                 //var_dump('*'.$daily_history_n_ago_buf->price, '-'.$price);
                 if ($daily_history_n_ago_buf->price > $price) {  //daily_historiesテーブルのpriceを取得
                     //黒三兵は数が多く、タイムアウトになってしまう場合があるため、絞り込み条件を追加
-                    //変化の割合が0.985%以上かチェック
+                    //変化の割合が0.995%以上かチェック  要調整
                     if ((floatval($daily_history_n_ago_buf->price) > 0) && ($daily_history_n_ago_buf->price != null)) {
                         $result = (floatval($price) / floatval($daily_history_n_ago_buf->price));
-                        if ($result <= floatval(0.985)) {
+                        if ($result <= floatval(0.995)) {
                             $kurosan_array[$arrayidx][$n_bizday_ago_str] = $daily_history_n_ago_buf->price;
                             array_push($kurosan_array_buf, $kurosan_array[$arrayidx]);
                             //dd($kurosan_array_buf);
