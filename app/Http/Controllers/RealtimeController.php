@@ -36,12 +36,17 @@ class RealtimeController extends Controller
 
     public function index_history()
     {
-        $realtime_settings = RealtimeSetting::where('user_id', Auth::id())->get();
-        $realtime_settings_ids = $realtime_settings->pluck('id');
-        //dd($realtime_settings_ids);
-        $matched_histories = MatchedHistory::where('realtime_setting_id', $realtime_settings_ids)->get();
-        //dd($matched_histories);
-        //$matched_histories = MatchedHistory::orderBy('matchedat', 'desc')->get();
+        //ログインしていない時は仮に1番目のレコードをセットし、viewでログインを促す
+        $matched_histories = MatchedHistory::first();
+        if (Auth::check()) {
+            // ユーザーはログインしている
+            $realtime_settings = RealtimeSetting::where('user_id', Auth::id())->get();
+            $realtime_settings_ids = $realtime_settings->pluck('id');
+            //dd($realtime_settings_ids);
+            $matched_histories = MatchedHistory::where('realtime_setting_id', $realtime_settings_ids)->get();
+            //dd($matched_histories);
+            //$matched_histories = MatchedHistory::orderBy('matchedat', 'desc')->get();
+        }
         return view('realtime_history', compact('matched_histories'));
     }
 
