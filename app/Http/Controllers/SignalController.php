@@ -18,7 +18,7 @@ class SignalController extends Controller
 
     public function index()
     {
-        return view('signal');
+        return redirect('/signal_volume');
     }
 
     /**
