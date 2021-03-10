@@ -49940,8 +49940,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/zerogravity0/0gravity0.com/public_html/kabuboard/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /home/zerogravity0/0gravity0.com/public_html/kabuboard/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\as\010_prg\020_laravel\kabuboard\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\as\010_prg\020_laravel\kabuboard\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
