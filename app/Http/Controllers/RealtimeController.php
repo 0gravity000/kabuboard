@@ -205,10 +205,12 @@ class RealtimeController extends Controller
     public function destroy_allhistory()
     {
         $realtime_settings = RealtimeSetting::where('user_id', Auth::id())->get();
-        foreach ($realtime_settings as $realtime_setting) {
-            $matched_history = MatchedHistory::where('realtime_setting_id', $realtime_setting->id)->first();
-            $matched_history->delete();
-        }
+            foreach ($realtime_settings as $realtime_setting) {
+                if(MatchedHistory::where('realtime_setting_id', $realtime_setting->id)->excits()) {
+                    $matched_history = MatchedHistory::where('realtime_setting_id', $realtime_setting->id)->get();
+                    $matched_history->delete();
+                }
+            }
        return redirect('/realtime_history');
     }
 
