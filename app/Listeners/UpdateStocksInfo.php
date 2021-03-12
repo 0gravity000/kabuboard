@@ -18,6 +18,7 @@ use App\MatchedHistory;
 use App\Matchtype;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MinitlyCheckConditionSatisfied;
+use App\User;
 
 class UpdateStocksInfo
 {
@@ -170,9 +171,9 @@ class UpdateStocksInfo
                         $matched_history->memo = $realtime_checking->price;
                         $matched_history->matchedat = $realtime_checking->price_checkingat;
                         $matched_history->save();
-
                         //メール送信
-                        Mail::to($realtime_setting->user_id)->send(new MinitlyCheckConditionSatisfied($realtime_setting, $matched_history));
+                        $user = User::where('id', $realtime_setting->user_id)->first();
+                        Mail::to($user->email)->send(new MinitlyCheckConditionSatisfied($realtime_setting, $matched_history));
                     }
                 }
             }
@@ -190,9 +191,9 @@ class UpdateStocksInfo
                         $matched_history->memo = $realtime_checking->price;
                         $matched_history->matchedat = $realtime_checking->price_checkingat;
                         $matched_history->save();
-
                         //メール送信
-                        Mail::to($realtime_setting->user_id)->send(new MinitlyCheckConditionSatisfied($realtime_setting, $matched_history));
+                        $user = User::where('id', $realtime_setting->user_id)->first();
+                        Mail::to($user->email)->send(new MinitlyCheckConditionSatisfied($realtime_setting, $matched_history));
                     }
                 }
             }
@@ -211,7 +212,8 @@ class UpdateStocksInfo
                         $matched_history->matchedat = $realtime_checking->rate_checkingat;
                         $matched_history->save();
                         //メール送信
-                        Mail::to($realtime_setting->user_id)->send(new MinitlyCheckConditionSatisfied($realtime_setting, $matched_history));
+                        $user = User::where('id', $realtime_setting->user_id)->first();
+                        Mail::to($user->email)->send(new MinitlyCheckConditionSatisfied($realtime_setting, $matched_history));
                     }    
                 }
             }
