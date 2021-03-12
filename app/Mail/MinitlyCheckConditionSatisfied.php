@@ -39,7 +39,11 @@ class MinitlyCheckConditionSatisfied extends Mailable
           'name' => $this->realtime_setting->stock->name,
           'upperlimit' => $this->realtime_setting->upperlimit,
           'lowerlimit' => $this->realtime_setting->lowerlimit,
+          'checking_price' => $this->realtime_setting->realtime_checking->price,
+
           'changerate' => $this->realtime_setting->changerate,
+          'checking_rate' => $this->realtime_setting->realtime_checking->rate,
+
           'matchtype_id' => $this->matched_history->matchtype->id,
         ]);
     }
