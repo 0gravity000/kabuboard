@@ -206,7 +206,7 @@ class RealtimeController extends Controller
     {
         $realtime_settings = RealtimeSetting::where('user_id', Auth::id())->get();
             foreach ($realtime_settings as $realtime_setting) {
-                if(MatchedHistory::where('realtime_setting_id', $realtime_setting->id)->excits()) {
+                if(MatchedHistory::where('realtime_setting_id', $realtime_setting->id)->exists()) {
                     $matched_history = MatchedHistory::where('realtime_setting_id', $realtime_setting->id)->get();
                     $matched_history->delete();
                 }
