@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+<!--  created with free sitemap generation system www.sitemapxml.jp  --> 
+<url>
+  <loc>https://kabuboard.0gravity0.com/</loc>
+  <priority>1.0</priority>
+  <changefreq>daily</changefreq>
+</url>
+<url>
+  <loc>https://kabuboard.0gravity0.com/login</loc>
+  <priority>0.8</priority>
+  <changefreq>daily</changefreq>
+</url>
+<url>
+  <loc>https://kabuboard.0gravity0.com/register</loc>
+  <priority>0.8</priority>
+  <changefreq>daily</changefreq>
+</url>
+<url>
+  <loc>https://kabuboard.0gravity0.com/meigara</loc>
+  <priority>0.8</priority>
+  <changefreq>daily</changefreq>
+</url>
+<url>
+  <loc>https://kabuboard.0gravity0.com/realtime_checking</loc>
+  <priority>0.7</priority>
+  <changefreq>daily</changefreq>
+</url>
+<url>
+  <loc>https://kabuboard.0gravity0.com/realtime_history</loc>
+  <priority>0.7</priority>
+  <changefreq>daily</changefreq>
+</url>
+<url>
+  <loc>https://kabuboard.0gravity0.com/signal</loc>
+  <priority>0.7</priority>
+  <changefreq>daily</changefreq>
+</url>
+<url>
+  <loc>https://kabuboard.0gravity0.com/password/reset</loc>
+  <priority>0.7</priority>
+  <changefreq>daily</changefreq>
+</url>
+<url>
+  <loc>https://kabuboard.0gravity0.com/signal_volume</loc>
+  <priority>0.6</priority>
+  <changefreq>daily</changefreq>
+</url>
+<url>
+  <loc>https://kabuboard.0gravity0.com/signal_akasanpei</loc>
+  <priority>0.5</priority>
+  <changefreq>daily</changefreq>
+</url>
+<url>
+  <loc>https://kabuboard.0gravity0.com/signal_kurosanpei</loc>
+  <priority>0.5</priority>
+  <changefreq>daily</changefreq>
+</url>
+
+</urlset>
