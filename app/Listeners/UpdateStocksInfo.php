@@ -65,6 +65,7 @@ class UpdateStocksInfo
             $client = new Client();   //composer require fabpot/goutte しておくこと
             $crawler = $client->request('GET', $html);
             //要検討 URLが存在しない場合はどうなる
+            /* エラーになるためコメントアウト
             //#main > div.selectFinTitle.yjL
             $notexist = $crawler->filter('table.stocksTable tr')->each(function ($node) {  //戻り値は配列
                 $notexist_temp = $node->text();
@@ -73,6 +74,7 @@ class UpdateStocksInfo
             if($notexist[0]==' 一致する銘柄は見つかりませんでした') {
                 Log::info($html.":".$notexist[0]);
             }
+            */
 
             //毎分用データ取得
             //終値
