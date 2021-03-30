@@ -93,9 +93,13 @@ class UpdateStocksInfo
             });
             //Log::debug($ratestring);
             //比率　加工後データ x.xx%
-            $startpos = mb_strpos($ratestring[0], '（');
-            $endpos = mb_strpos($ratestring[0], '%');
-            $rate = mb_substr($ratestring[0], $startpos+1, ($endpos-$startpos)-1);
+            if (empty($ratestring)) {
+                $rate = 0;
+            } else {
+                $startpos = mb_strpos($ratestring[0], '（');
+                $endpos = mb_strpos($ratestring[0], '%');
+                $rate = mb_substr($ratestring[0], $startpos+1, ($endpos-$startpos)-1);
+            }
             //Log::debug($rate);
 
             /* 日足用データ
