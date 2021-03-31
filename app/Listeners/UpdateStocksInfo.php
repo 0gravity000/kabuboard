@@ -65,16 +65,18 @@ class UpdateStocksInfo
             $client = new Client();   //composer require fabpot/goutte しておくこと
             $crawler = $client->request('GET', $html);
             //要検討 URLが存在しない場合はどうなる
-            /* エラーになるためコメントアウト
             //#main > div.selectFinTitle.yjL
             $notexist = $crawler->filter('table.stocksTable tr')->each(function ($node) {  //戻り値は配列
                 $notexist_temp = $node->text();
                 return $notexist_temp;
             });
-            if($notexist[0]==' 一致する銘柄は見つかりませんでした') {
-                Log::info($html.":".$notexist[0]);
+            try {
+                if($notexist[0]==' 一致する銘柄は見つかりませんでした') {
+                    Log::info($html.":".$stockcode);
+                }
+            } catch (\Exception $e) {
+                Log::info($html.":".$stockcode);
             }
-            */
 
             //毎分用データ取得
             //終値
@@ -95,6 +97,7 @@ class UpdateStocksInfo
             //比率　加工後データ x.xx%
             if (empty($ratestring)) {
                 $rate = 0;
+                Log::debug($rate.":".$stockcode);
             } else {
                 $startpos = mb_strpos($ratestring[0], '（');
                 $endpos = mb_strpos($ratestring[0], '%');
@@ -126,9 +129,14 @@ class UpdateStocksInfo
             */
 
             //7:00-9:00はYahooサイトはメンテナンス状態で通常の値でなくなる(---)ためDB登録しないようにする
-            if (!is_numeric(floatval(str_replace(',','',$price[0])))) {
+            try {
+                if (!is_numeric(floatval(str_replace(',','',$price[0])))) {
+                    continue; //何もしないで関数を抜ける
+                }
+            } catch (\Exception $e) {
                 continue; //何もしないで関数を抜ける
             }
+
             //DB登録 stocksテーブル            
             $stock->price = floatval(str_replace(',','',$price[0]));
             $stock->rate = floatval($rate);
